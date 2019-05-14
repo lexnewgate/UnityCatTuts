@@ -39,26 +39,29 @@ public class GridMesh : MonoBehaviour
        _vertices=new Vector3[(xSize+1)*(ySize+1)];
        for (int i = 0,k=0; i < ySize+1; i++)
        {
-           for (int j = 0; j < xSize+1; j++ ,k++)
+           for (int j = 0; j < xSize+1; j++ ,k++) 
            {
                _vertices[k] =new Vector3(j,i,0);
-//               await new WaitForSeconds(.2f);
+               await new WaitForSeconds(0.05f);
            } 
        }
        
-       //fill tris
-       _tris = new int[6 * xSize ];
-//       _tris[0] = 0;
-//       _tris[1] = xSize ;
-//       _tris[2] = 1;
-       for (int vi = 0,quad=0; quad<xSize ; quad++,vi+=6)
-       {
-           _tris[vi] = vi;
-           _tris[vi + 4] = _tris[vi + 1] = xSize + 1 + vi;
-           _tris[vi + 3] = _tris[vi + 2] = 1 + vi;
-           _tris[vi + 5] = xSize + 2 + vi;
-       }
        
+//       _tris = new int[3];
+       
+       // grid cell 
+       // p+(x+1) |         |p+1+(x+1) 
+       //         |  m , n  |                p= (x+1)*n+m 
+       //        p|         |p+1 
+       
+       
+       
+        
+       
+       
+       
+       
+      
        _mesh.vertices = _vertices;
         _mesh.triangles = _tris;
           GetComponent<MeshFilter>().mesh = _mesh;
