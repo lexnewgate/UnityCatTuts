@@ -8,45 +8,36 @@ public class GridMesh : MonoBehaviour
 
     public int xSize, ySize;
 
-    private Vector3[] _vertices;
-    private int[] _tris;
-    private Mesh _mesh;
-
     private void Awake()
     {
         Generate();
     }
 
-    private void OnDrawGizmos()
+
+    private void Generate()
     {
-        if (_vertices == null)
-            return;
-
-        foreach (var vertex in _vertices)
-        {
-            Gizmos.DrawSphere(transform.TransformPoint(vertex), .1f);
-        }
-    }
+        var mesh = new Mesh();
+        var vertices = new Vector3[(xSize + 1) * (ySize + 1)];
+        var uv = new Vector2[vertices.Length];
+        var triangles = new int[xSize * ySize * 2 * 3];
+        var tangents= new Vector4[vertices.Length];
 
 
-    private async void Generate()
-    {
-        _mesh = new Mesh();
-        _mesh.name = "Procedural Mesh";
-        GetComponent<MeshFilter>().mesh = _mesh;
-        _vertices = new Vector3[(xSize + 1) * (ySize + 1)];
-        _tris = new int[xSize * ySize * 2 * 3];
-              //fill vertices 
+        #region fill vertices and uv
         for (int i = 0, k = 0; i < ySize + 1; i++)
         {
             for (int j = 0; j < xSize + 1; j++, k++)
             {
-                _vertices[k] = new Vector3(j, i, 0);
+                vertices[k] = new Vector3(j, i, 0);
+                tangents[k] = new Vector4(0f, 1f, 0f, 1f);
+                uv[k]=new Vector2((float)j/xSize,(float)i/ySize);
             }
         }
-       _mesh.vertices = _vertices;
-
-
+        mesh.vertices = vertices;
+        mesh.uv = uv;
+        mesh.tangents = tangents;
+        #endregion
+        #region fill triangles
 
         //fill grid
         // grid cell 
@@ -54,26 +45,34 @@ public class GridMesh : MonoBehaviour
         //         |  m , n  |                p= (x+1)*n+m 
         //        p|         |p+1 
 
-        for (int i = 0, quad = 0; i < xSize; i++)
+        for (int j = 0, quad = 0; j < ySize; j++)
         {
-            for (int j = 0; j < ySize; j++, quad++)
+            for (int i = 0; i < xSize; i++, quad++)
             {
                 var triIndexBase = quad * 6;
                 var p = (xSize + 1) * j + i;
-                _tris[triIndexBase + 0] = p;
-                _tris[triIndexBase + 1] = p + (xSize + 1);
-                _tris[triIndexBase + 2] = p + 1;
-                _tris[triIndexBase + 3] = p + 1;
-                _tris[triIndexBase + 4] = p + (xSize + 1);
-                _tris[triIndexBase + 5] = p + 1 + (xSize + 1);
-
-                await new WaitForSeconds(0.05f);
-               _mesh.triangles = _tris;
+                triangles[triIndexBase + 0] = p;
+                triangles[triIndexBase + 1] = p + (xSize + 1);
+                triangles[triIndexBase + 2] = p + 1;
+                triangles[triIndexBase + 3] = p + 1;
+                triangles[triIndexBase + 4] = p + (xSize + 1);
+                triangles[triIndexBase + 5] = p + 1 + (xSize + 1);
             }
+
         }
 
-        _mesh.triangles = _tris;
+        #endregion
+        #region fill mesh  
 
+        mesh.triangles = triangles;
+        mesh.RecalculateNormals();
+        mesh.name = "Procedural Mesh";
+
+        #endregion
+
+
+
+        GetComponent<MeshFilter>().mesh = mesh;
     }
 
 
