@@ -8,8 +8,8 @@ namespace Meshes
         private MeshRenderer _meshRenderer;
         private void Awake()
         {
-            _meshFilter = AddEssentialComponent<MeshFilter>();
-            _meshRenderer = AddEssentialComponent<MeshRenderer>();
+            _meshFilter = AddEssentialComponent<MeshFilter>();//hold mesh
+            _meshRenderer = AddEssentialComponent<MeshRenderer>();//configure how to render
         }
 
         TComponent AddEssentialComponent<TComponent>() where  TComponent: Component
